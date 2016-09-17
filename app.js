@@ -14,7 +14,8 @@ app.get("health", (req, res) => {
     res.end();
 });
 
-app.get("/info/(gen|poll)", (req, res) => {
+app.get("/info/gen|info/poll", (req, res) => {
+    let url = req.url;
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'no-cache, no-store');
     res.end(JSON.stringify(sysInfo[url.slice(6)]()));
