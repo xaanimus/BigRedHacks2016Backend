@@ -7,7 +7,8 @@ const MYSQL_DB_HOST = process.env.OPENSHIFT_MYSQL_DB_HOST || 'localhost',
       MYSQL_USER = process.env.OPENSHIFT_MYSQL_DB_USERNAME || 'root',
       MYSQL_PASS = process.env.OPENSHIFT_MYSQL_DB_PASSWORD,
       SALT = '$2a$10$SZL5SDwUbvXDdhM4kkfFNu',
-      DOLLAR_PER_KHW = 0.12;
+      DOLLAR_PER_KHW = 0.12,
+      CAPITAL_ONE_KEY = '';
 
 function genSessionID() {
     return Math.floor(Math.random() * 1000000);
@@ -82,7 +83,7 @@ function Model() {
             var options = {};
             options.method = 'POST';
             options.url = 'http://api.reimaginebanking.com/customers';
-            options.qs = { key: '0f426456b1a8b556fbcbdd446ba29f0b' };
+            options.qs = { key: CAPITAL_ONE_KEY };
             options.headers = {
                 'content-type': 'application/json'
             };
@@ -126,7 +127,7 @@ function Model() {
                 accountOpt.method = "POST";
                 accountOpt.url = 'http://api.reimaginebanking.com/customers/'+
                     obj.objectCreated._id+"/accounts";
-                accountOpt.qs = { key: '0f426456b1a8b556fbcbdd446ba29f0b' };
+                accountOpt.qs = { key: CAPITAL_ONE_KEY };
                 accountOpt.headers = {
                     "content-type" : "application/json"
                 };
@@ -326,7 +327,7 @@ function Model() {
             ops.method = "GET";
             ops.url = 'http://api.reimaginebanking.com/customers/'+
                 capitalId+"/accounts";
-            ops.qs = { key: '0f426456b1a8b556fbcbdd446ba29f0b' };
+            ops.qs = { key: CAPITAL_ONE_KEY };
             
             request(ops, function(error, response, body){
                 if (error) {console.log("err");return;}
