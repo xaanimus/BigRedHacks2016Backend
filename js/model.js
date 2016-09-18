@@ -3,7 +3,7 @@ const mysql = require('mysql'),
       request = require('request');
 
 const MYSQL_DB_HOST = process.env.OPENSHIFT_MYSQL_DB_HOST || 'localhost',
-      MYSQL_DB_PORT = process.env.OPENSHIFT_MYSQL_DB_PORT || 8080,
+      MYSQL_DB_PORT = process.env.OPENSHIFT_MYSQL_DB_PORT || 3306,
       MYSQL_USER = process.env.OPENSHIFT_MYSQL_DB_USERNAME || 'root',
       MYSQL_PASS = process.env.OPENSHIFT_MYSQL_DB_PASSWORD,
       SALT = '$2a$10$SZL5SDwUbvXDdhM4kkfFNu',
@@ -34,6 +34,7 @@ function Model() {
     console.log("will attempt to login with following settings");
     let connectSettings = {
         host    : MYSQL_DB_HOST,
+        port    : MYSQL_DB_PORT,
         user    : MYSQL_USER,
         pass    : MYSQL_PASS,
         database: 'brh'
