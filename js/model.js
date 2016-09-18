@@ -35,8 +35,8 @@ function Model() {
     let connectSettings = {
         host    : MYSQL_DB_HOST,
         port    : MYSQL_DB_PORT,
-        //user    : MYSQL_USER,
-        //pass    : MYSQL_PASS,
+        user    : MYSQL_USER,
+        password: MYSQL_PASS,
         database: 'brh'
     };
     console.log(connectSettings);
