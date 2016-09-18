@@ -8,22 +8,17 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended:true}));
 
 router.post("/user/new", (req, res) => {
-    let usrinfo = {
-        fname    : req.body.fname,
-        lname    : req.body.lname,
-        usrname  : req.body.usrname,
-        password : req.body.password,
-        longitude: req.body.longitude,
-        latitude : req.body.latitude
-    };
+    let usrinfo = req.body;
 
     model.newUser(usrinfo, (err, success) => {
         if (err != null) {
+            console.log(err);
             //duplicate username
             if (err.code == ER_DUP_ENTRY_CODE) {
                 res.json({
                     ok: false,
-                    code: "DUPLUSR"
+                    code: "DUPLUSR",
+                    why: "username taken"
                 });
             } else {
                 res.json({
@@ -45,13 +40,92 @@ router.post("/login/new", (req, res) => {
 
     model.session(usr, pass, (err, key) => {
         if (key == null) {
-            res.send("err");
+            res.json({ok:false});
             console.log(err);
         } else {
-            res.send("" + key);
+            res.json({ok:true, key:key});
         }
     });
 });
+
+router.post("/usage", (req, res) => {
+    let sid = req.body.sid;
+    let moment = req.body.moment;
+    let kwhamt = req.body.kwhamount;
+
+    model.postUsage(sid, moment, kwhamt, (err) => {
+        if (err) {
+            res.json({ok:false});
+            return;
+        }
+        res.json({ok:true});
+    });
+});
+
+router.post("/moneyspent/last6weeks", (req,res) => {
+    let sid = req.body.sid;
+    model.getMoneySpentLastSixWeeks(sid, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.json({ok:false});
+            return;
+        }
+        res.json({ok:false, content:result});
+    });
+});
+
+
+router.post("/moneyspent/lastweek", (req,res) => {
+    let sid = req.body.sid;
+    model.getMoneySpentLastWeek(sid, (err, dollars)=>{
+        if (err) {
+            console.log(err);
+            res.send({ok:false});
+            return;
+        }
+        res.send({ok:true, dollars:dollars});
+    });
+});
+
+//barely tested
+router.post("/moneyspent/compared", (req,res) => {
+    let sid = req.body.sid;
+    model.getMoneySpentComparedToOthersLastWeek(sid, (err, dollars)=>{
+        if (err) {
+            console.log(err);
+            res.json({ok:false});
+            return;
+        }
+        res.send({ok:true, dollars:dollars});
+    });
+});
+
+
+router.post("/user/top", (req, res) => {
+    let sid = req.body.sid;
+    model.getTopFiveUsers(sid, (err, users)=>{
+        if (err) {
+            console.log(err);
+            res.json({ok:false});
+            return;
+        }
+        res.json({ok:true, users:users});
+    });
+});
+
+router.post("/rewards", (req, res) => {
+    let sid = req.body.sid;
+    model.getRewards(sid, (err, rewards)=>{
+        if (err) {
+            console.log(err);
+            res.send("no");
+            return;
+        }
+        res.json({ok:true, rewards:rewards});
+    });
+});
+
+
 
 module.exports = function(app) {
     app.use(router);
