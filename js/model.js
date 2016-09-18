@@ -31,12 +31,15 @@ function isEmptyString(a) {
 function Model() {
     let self = {};
 
-    self.connection = mysql.createConnection({
+    console.log("will attempt to login with following settings");
+    let connectSettings = {
         host    : MYSQL_DB_HOST,
         user    : MYSQL_USER,
         pass    : MYSQL_PASS,
         database: 'brh'
-    });
+    };
+    console.log(connectSettings);
+    self.connection = mysql.createConnection(connectSettings);
     
     self.connection.connect();
 
