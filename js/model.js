@@ -1,5 +1,5 @@
 const mysql = require('mysql'),
-      bcrypt = require('bcrypt'),
+      hash = require('node_hash'),
       request = require('request');
 
 const MYSQL_DB_HOST = process.env.OPENSHIFT_MYSQL_DB_HOST || 'localhost',
@@ -54,21 +54,14 @@ function Model() {
             return;
         }
             
-        bcrypt.hash(userinfo.password, SALT, hashcb);
-
-        function hashcb(err, hash) {
-            if (err != null) {
-                cb(err);
-                return;
-            }
-
-            let sql = "INSERT INTO users VALUES\n" +
-                    "(?,?,?,?,?,?,NULL)";
-            self.connection.query(sql,
-                                  [userinfo.fname, userinfo.lname, userinfo.usrname,
-                                   hash, userinfo.longitude,userinfo.latitude],
-                                  sqlcb);
-        };
+        let h = hash.md5(userinfo.password, SALT);
+        
+        let sql = "INSERT INTO users VALUES\n" +
+                "(?,?,?,?,?,?,NULL)";
+        self.connection.query(sql,
+                              [userinfo.fname, userinfo.lname, userinfo.usrname,
+                               h, userinfo.longitude,userinfo.latitude],
+                              sqlcb);
 
         function sqlcb(err, results) {
             if (err != null) {
@@ -172,16 +165,12 @@ function Model() {
 
     self.authenticate = function(username,password,cb) {
         //gen hash
-        bcrypt.hash(password, SALT, hashcb);
+        let h = hash.md5(password, SALT);
         
         //check db if username - hash OK
-        function hashcb(err, hash) {
-            if (err != null) {cb(err, false);return;}
-
-            let sql = "SELECT passhash=?\n" +
-                    "FROM users WHERE usrname=?";
-            let fmtsql = self.connection.query(sql, [hash, username], sqlcb);
-        }
+        let sql = "SELECT passhash=?\n" +
+                "FROM users WHERE usrname=?";
+        let fmtsql = self.connection.query(sql, [h, username], sqlcb);
 
         function sqlcb(err, results) {
             if (err != null) {
